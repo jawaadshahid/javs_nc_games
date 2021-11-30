@@ -1,4 +1,4 @@
-const categoriesRouter = require("./categories.routers");
+const categoriesRouter = require("./categories.router");
 
 const apiRouter = require("express").Router();
 
