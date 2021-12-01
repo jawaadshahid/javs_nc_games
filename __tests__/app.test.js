@@ -19,6 +19,24 @@ afterAll(() => db.end());
 //   });
 // });
 
+const reviewObjTest = (reviewObj) => {
+  expect(reviewObj).toEqual(
+    expect.objectContaining({
+      review_id: expect.any(Number),
+      title: expect.any(String),
+      review_body: expect.any(String),
+      designer: expect.any(String),
+      review_img_url: expect.any(String),
+      votes: expect.any(Number),
+      category: expect.any(String),
+      owner: expect.any(String),
+      // TODO: is there a better test for a date?
+      created_at: expect.any(String),
+      comment_count: expect.any(Number),
+    })
+  );
+};
+
 describe("endpoint: '/api/categories'", () => {
   test("status 200: Responds with an array of category objects with correct properties'", () => {
     return request(app)
@@ -50,21 +68,7 @@ describe("endpoint: '/api/reviews'", () => {
         expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(13);
         reviews.forEach((review) => {
-          expect(review).toEqual(
-            expect.objectContaining({
-              review_id: expect.any(Number),
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              review_img_url: expect.any(String),
-              votes: expect.any(Number),
-              category: expect.any(String),
-              owner: expect.any(String),
-              // TODO: is there a better test for a date?
-              created_at: expect.any(String),
-              comment_count: expect.any(Number),
-            })
-          );
+          reviewObjTest(review);
         });
       });
   });
@@ -77,21 +81,7 @@ describe("endpoint: '/api/reviews/:review_id'", () => {
       .expect(200)
       .then(({ body }) => {
         const { review } = body;
-        expect(review).toEqual(
-          expect.objectContaining({
-            review_id: expect.any(Number),
-            title: expect.any(String),
-            review_body: expect.any(String),
-            designer: expect.any(String),
-            review_img_url: expect.any(String),
-            votes: expect.any(Number),
-            category: expect.any(String),
-            owner: expect.any(String),
-            // TODO: is there a better test for a date?
-            created_at: expect.any(String),
-            comment_count: expect.any(Number),
-          })
-        );
+        reviewObjTest(review);
       });
   });
 });
