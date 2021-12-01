@@ -35,17 +35,17 @@ exports.patchReviewById = (req, res, next) => {
     });
   } else {
     const { inc_votes } = req.body;
-    if (isNaN(inc_votes)) {
-      next({
-        status: 422,
-        msg: "Unprocessable Entity: Invalid request",
-      });
-    } else {
+    if (!isNaN(inc_votes) && Object.keys(req.body).length === 1) {
       incrementReviewVotesById(review_id, inc_votes)
         .then((review) => {
           res.status(200).send({ review });
         })
         .catch(next);
+    } else {
+      next({
+        status: 422,
+        msg: "Unprocessable Entity: Invalid request",
+      });
     }
   }
 };

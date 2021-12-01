@@ -101,7 +101,7 @@ describe("endpoint: get '/api/reviews/:review_id'", () => {
   });
 });
 
-describe("endpoint: patch '/api/reviews/:review_id'", () => {
+describe.only("endpoint: patch '/api/reviews/:review_id'", () => {
   test("status 200: Request body accepts correct object", () => {
     const sendData = { inc_votes: 1 };
     return request(app).patch("/api/reviews/3").send(sendData).expect(200);
@@ -140,6 +140,16 @@ describe("endpoint: patch '/api/reviews/:review_id'", () => {
   });
   test("status 422: Responds with Unprocessable Entity when inc_votes value invalid", () => {
     const sendData = { inc_votes: "cat" };
+    return request(app)
+      .patch("/api/reviews/3")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
+      });
+  });
+  test("status 422: Responds with Unprocessable Entity when Some other property on request body", () => {
+    const sendData = { inc_votes: 1, ping: "pong" };
     return request(app)
       .patch("/api/reviews/3")
       .send(sendData)
