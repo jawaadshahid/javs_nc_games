@@ -30,7 +30,6 @@ const reviewObjTest = (reviewObj) => {
       votes: expect.any(Number),
       category: expect.any(String),
       owner: expect.any(String),
-      // TODO: is there a better test for a date?
       created_at: expect.any(String),
       comment_count: expect.any(Number),
     })
@@ -74,7 +73,7 @@ describe("endpoint: '/api/reviews'", () => {
   });
 });
 
-describe("endpoint: '/api/reviews/:review_id'", () => {
+describe.only("endpoint: '/api/reviews/:review_id'", () => {
   test("status 200: Responds with a review object, which should have the expected properties'", () => {
     return request(app)
       .get("/api/reviews/3")
@@ -82,6 +81,22 @@ describe("endpoint: '/api/reviews/:review_id'", () => {
       .then(({ body }) => {
         const { review } = body;
         reviewObjTest(review);
+      });
+  });
+  test("status 400: Responds with Bad request error 'Bad request: Invalid Review ID'", () => {
+    return request(app)
+      .get("/api/reviews/asd")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request: Invalid Review ID");
+      });
+  });
+  test("status 404: Responds with Not found error 'Review not found'", () => {
+    return request(app)
+      .get("/api/reviews/999999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Review not found");
       });
   });
 });

@@ -18,6 +18,11 @@ exports.selectReviews = () => {
 };
 
 exports.selectReviewById = (review_id) => {
+  if (isNaN(review_id))
+    return Promise.reject({
+      status: 400,
+      msg: "Bad request: Invalid Review ID",
+    });
   return db
     .query(
       `
@@ -32,5 +37,14 @@ exports.selectReviewById = (review_id) => {
     ;`,
       [review_id]
     )
-    .then((results) => results.rows[0]);
+    .then((results) => {
+      if (results.rows.length > 0) {
+        return results.rows[0];
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: "Review not found",
+        });
+      }
+    });
 };
