@@ -36,7 +36,7 @@ const reviewObjTest = (reviewObj) => {
   );
 };
 
-describe("endpoint: '/api/categories'", () => {
+describe("endpoint: get '/api/categories'", () => {
   test("status 200: Responds with an array of category objects with correct properties'", () => {
     return request(app)
       .get("/api/categories")
@@ -57,7 +57,7 @@ describe("endpoint: '/api/categories'", () => {
   });
 });
 
-describe("endpoint: '/api/reviews'", () => {
+describe("endpoint: get '/api/reviews'", () => {
   test("status 200: Responds with an array of review objects with the expected properties'", () => {
     return request(app)
       .get("/api/reviews")
@@ -73,7 +73,7 @@ describe("endpoint: '/api/reviews'", () => {
   });
 });
 
-describe.only("endpoint: '/api/reviews/:review_id'", () => {
+describe("endpoint: get '/api/reviews/:review_id'", () => {
   test("status 200: Responds with a review object, which should have the expected properties'", () => {
     return request(app)
       .get("/api/reviews/3")
@@ -83,7 +83,7 @@ describe.only("endpoint: '/api/reviews/:review_id'", () => {
         reviewObjTest(review);
       });
   });
-  test("status 400: Responds with Bad request error 'Bad request: Invalid Review ID'", () => {
+  test("status 400: Responds with Bad request error when review_id invalid", () => {
     return request(app)
       .get("/api/reviews/asd")
       .expect(400)
@@ -91,12 +91,61 @@ describe.only("endpoint: '/api/reviews/:review_id'", () => {
         expect(body.msg).toBe("Bad request: Invalid Review ID");
       });
   });
-  test("status 404: Responds with Not found error 'Review not found'", () => {
+  test("status 404: Responds with Not found error when review object not found", () => {
     return request(app)
       .get("/api/reviews/999999")
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Review not found");
+      });
+  });
+});
+
+describe("endpoint: patch '/api/reviews/:review_id'", () => {
+  test("status 200: Request body accepts correct object", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app).patch("/api/reviews/3").send(sendData).expect(200);
+  });
+  test("Responds with the updated review object", () => {
+    const sendData = { inc_votes: -2 };
+    return request(app)
+      .patch("/api/reviews/3")
+      .send(sendData)
+      .expect(200)
+      .then(({ body }) => {
+        const { review } = body;
+        reviewObjTest(review);
+        expect(review.votes).toBe(3);
+      });
+  });
+  test("status 400: Responds with Bad request error when review_id invalid", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/reviews/asd")
+      .send(sendData)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request: Invalid Review ID");
+      });
+  });
+  test("status 422: Responds with Unprocessable Entity when inc_votes not set", () => {
+    const sendData = {};
+    return request(app)
+      .patch("/api/reviews/3")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
+      });
+  });
+  test("status 422: Responds with Unprocessable Entity when inc_votes value invalid", () => {
+    const sendData = { inc_votes: "cat" };
+    return request(app)
+      .patch("/api/reviews/3")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
       });
   });
 });

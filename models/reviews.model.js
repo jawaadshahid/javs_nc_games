@@ -18,11 +18,6 @@ exports.selectReviews = () => {
 };
 
 exports.selectReviewById = (review_id) => {
-  if (isNaN(review_id))
-    return Promise.reject({
-      status: 400,
-      msg: "Bad request: Invalid Review ID",
-    });
   return db
     .query(
       `
@@ -46,5 +41,22 @@ exports.selectReviewById = (review_id) => {
           msg: "Review not found",
         });
       }
+    });
+};
+
+exports.incrementReviewVotesById = (review_id, voteIncBy) => {
+  // TODO: can I return the review object (with comment_count) within 1 query?
+  // If yes, need to handle 404
+  return db
+    .query(
+      `
+    UPDATE reviews 
+      SET votes = votes + $2
+    WHERE review_id = $1
+    ;`,
+      [review_id, voteIncBy]
+    )
+    .then(() => {
+      return this.selectReviewById(review_id);
     });
 };
