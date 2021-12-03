@@ -24,6 +24,18 @@ const reviewObjTest = (reviewObj) => {
   );
 };
 
+const commentObjTest = (commentObj) => {
+  expect(commentObj).toEqual(
+    expect.objectContaining({
+      comment_id: expect.any(Number),
+      votes: expect.any(Number),
+      created_at: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+    })
+  );
+};
+
 describe("endpoint: get '/api/categories'", () => {
   test("status 200: Responds with an array of category objects with correct properties'", () => {
     return request(app)
@@ -63,7 +75,7 @@ describe("endpoint: get '/api/reviews/:review_id'", () => {
         expect(body.msg).toBe("Bad request: Invalid Review ID");
       });
   });
-  test("status 404: Not found error when review object not found", () => {
+  test("status 404: Not found error when review not found", () => {
     return request(app)
       .get("/api/reviews/999999")
       .expect(404)
@@ -216,6 +228,38 @@ describe("endpoint: get '/api/reviews'", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found: no reviews found");
+      });
+  });
+});
+
+describe("endpoint: get '/api/reviews/:review_id/comments'", () => {
+  test("status 200: Responds with an array of comments for the given `review_id`", () => {
+    return request(app)
+      .get("/api/reviews/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeInstanceOf(Array);
+        expect(comments).toHaveLength(3);
+        comments.forEach((comment) => {
+          commentObjTest(comment);
+        });
+      });
+  });
+  test("status 404: Not found error when review not found", () => {
+    return request(app)
+      .get("/api/reviews/999999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no reviews found");
+      });
+  });
+  test("status 404: Not found error when comments not found", () => {
+    return request(app)
+      .get("/api/reviews/1/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no comments found");
       });
   });
 });

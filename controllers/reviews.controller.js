@@ -37,17 +37,11 @@ exports.getReviewById = (req, res, next) => {
 
 exports.patchReviewById = (req, res, next) => {
   const { review_id } = req.params;
-  const { inc_votes } = req.body;
-  if (Object.keys(req.body).length !== 1) {
-    next({
-      status: 422,
-      msg: "Unprocessable Entity: Invalid request",
-    });
-  } else {
-    incrementReviewVotesById(review_id, inc_votes)
-      .then((review) => {
-        res.status(200).send({ review });
-      })
-      .catch(next);
-  }
+  const inc_votes =
+    Object.keys(req.body).length === 1 ? req.body.inc_votes : undefined;
+  incrementReviewVotesById(review_id, inc_votes)
+    .then((review) => {
+      res.status(200).send({ review });
+    })
+    .catch(next);
 };
