@@ -1,6 +1,19 @@
 const db = require("../db/connection");
 
-const isReviewIdValid = (review_id) => !isNaN(review_id);
+exports.ifReviewExistsById = (review_id) => {
+  return db
+    .query(`SELECT EXISTS(SELECT 1 FROM reviews WHERE review_id = $1);`, [
+      review_id,
+    ])
+    .then((results) => {
+      if (!results.rows[0].exists) {
+        return Promise.reject({
+          status: 404,
+          msg: "Not found: no reviews found",
+        });
+      }
+    });
+};
 
 exports.selectReviews = (sort_by = "created_at", order = "desc", category) => {
   let queryStr = `
@@ -48,19 +61,12 @@ exports.selectReviews = (sort_by = "created_at", order = "desc", category) => {
   return db
     .query(queryStr, category ? [category] : undefined)
     .then((results) => {
-      if (results.rows.length > 0) {
-        return results.rows;
-      } else {
-        return Promise.reject({
-          status: 404,
-          msg: "Not found: no reviews found",
-        });
-      }
+      return results.rows;
     });
 };
 
 exports.selectReviewById = (review_id) => {
-  if (!isReviewIdValid(review_id)) {
+  if (isNaN(review_id)) {
     return Promise.reject({
       status: 400,
       msg: `Bad request: Invalid Review ID`,
@@ -93,7 +99,7 @@ exports.selectReviewById = (review_id) => {
 };
 
 exports.incrementReviewVotesById = (review_id, inc_votes) => {
-  if (!isReviewIdValid(review_id)) {
+  if (isNaN(review_id)) {
     return Promise.reject({
       status: 400,
       msg: `Bad request: Invalid Review ID`,

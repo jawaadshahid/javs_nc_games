@@ -214,6 +214,7 @@ describe("endpoint: get '/api/reviews'", () => {
       .get("/api/reviews?category=social deduction")
       .then(({ body }) => {
         const { reviews } = body;
+        expect(reviews).toBeInstanceOf(Array);
         expect(reviews).toHaveLength(11);
         reviews.forEach((review) => {
           expect(review).toEqual(
@@ -232,12 +233,13 @@ describe("endpoint: get '/api/reviews'", () => {
         expect(body.msg).toBe("Not found: no categories found");
       });
   });
-  test("status 404: Not found error when no reviews associated with category", () => {
+  test("should return empty array when no reviews associated with category", () => {
     return request(app)
       .get("/api/reviews?category=children's games")
-      .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Not found: no reviews found");
+        const { reviews } = body;
+        expect(reviews).toBeInstanceOf(Array);
+        expect(reviews).toHaveLength(0);
       });
   });
 });
@@ -262,7 +264,7 @@ describe("endpoint: get '/api/reviews/:review_id/comments'", () => {
       .get("/api/reviews/asd/comments")
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad request: Invalid Review ID");
+        expect(body.msg).toBe("Bad request: Invalid input");
       });
   });
   test("status 404: Not found error when review not found", () => {
@@ -319,7 +321,7 @@ describe("endpoint: post '/api/reviews/:review_id/comments'", () => {
       .send(sendData)
       .expect(400)
       .then(({ body }) => {
-        expect(body.msg).toBe("Bad request: Invalid Review ID");
+        expect(body.msg).toBe("Bad request: Invalid input");
       });
   });
   test("status 404: Not found error when review not found", () => {
