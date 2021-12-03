@@ -1,3 +1,4 @@
+const format = require("pg-format");
 const db = require("../db/connection");
 
 exports.selectCommentsByReviewId = (review_id) => {
@@ -25,4 +26,20 @@ exports.selectCommentsByReviewId = (review_id) => {
         });
       }
     });
+};
+
+exports.insertCommentByReviewId = (review_id, author, body) => {
+  const commentToInsert = [author, review_id, body];
+  const queryStr = format(
+    `
+    INSERT INTO comments
+      (author, review_id, body)
+    VALUES
+      %L
+    RETURNING *;`,
+    [commentToInsert]
+  );
+  return db.query(queryStr).then((results) => {
+    return results.rows[0];
+  });
 };

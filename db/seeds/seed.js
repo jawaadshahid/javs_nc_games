@@ -124,8 +124,7 @@ const seed = (data) => {
         INSERT INTO comments
           (author, review_id, votes, created_at, body)
         VALUES
-          %L
-        RETURNING *;`,
+          %L;`,
         formattedCommentData
       );
       return db.query(queryStr);

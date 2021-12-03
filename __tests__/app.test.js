@@ -86,7 +86,7 @@ describe("endpoint: get '/api/reviews/:review_id'", () => {
 });
 
 describe("endpoint: patch '/api/reviews/:review_id'", () => {
-  test("status 200: Request body accepts correct object", () => {
+  test("status 200: Request body accepts an object", () => {
     const sendData = { inc_votes: 1 };
     return request(app).patch("/api/reviews/3").send(sendData).expect(200);
   });
@@ -110,6 +110,16 @@ describe("endpoint: patch '/api/reviews/:review_id'", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request: Invalid Review ID");
+      });
+  });
+  test("status 404: Not found error when review not found", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/reviews/99999")
+      .send(sendData)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no reviews found");
       });
   });
   test("status 422: Unprocessable Entity error when inc_votes not set", () => {
@@ -246,6 +256,15 @@ describe("endpoint: get '/api/reviews/:review_id/comments'", () => {
         });
       });
   });
+  test("status 400: Bad request error when review_id invalid", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app)
+      .get("/api/reviews/asd/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request: Invalid Review ID");
+      });
+  });
   test("status 404: Not found error when review not found", () => {
     return request(app)
       .get("/api/reviews/999999/comments")
@@ -260,6 +279,60 @@ describe("endpoint: get '/api/reviews/:review_id/comments'", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found: no comments found");
+      });
+  });
+});
+
+describe("endpoint: post '/api/reviews/:review_id/comments'", () => {
+  test("status 201: Request body accepts an object", () => {
+    const sendData = {
+      username: "dav3rid",
+      body: "Laborum commodo magna ipsum eiusmod. Anim ad irure dolor do non ex quis dolore.",
+    };
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .send(sendData)
+      .expect(201);
+  });
+  test("Request Responds with the posted comment", () => {
+    const sendData = {
+      username: "mallionaire",
+      body: "Laborum commodo magna ipsum eiusmod. Anim ad irure dolor do non ex quis dolore.",
+    };
+    return request(app)
+      .post("/api/reviews/3/comments")
+      .send(sendData)
+      .then(({ body }) => {
+        const { comment } = body;
+        expect(comment).toBeInstanceOf(Object);
+        expect(comment.author).toEqual(sendData.username);
+        expect(comment.body).toEqual(sendData.body);
+      });
+  });
+  test("status 400: Bad request error when review_id invalid", () => {
+    const sendData = {
+      username: "mallionaire",
+      body: "Laborum commodo magna ipsum eiusmod. Anim ad irure dolor do non ex quis dolore.",
+    };
+    return request(app)
+      .post("/api/reviews/asd/comments")
+      .send(sendData)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request: Invalid Review ID");
+      });
+  });
+  test("status 404: Not found error when review not found", () => {
+    const sendData = {
+      username: "mallionaire",
+      body: "Laborum commodo magna ipsum eiusmod. Anim ad irure dolor do non ex quis dolore.",
+    };
+    return request(app)
+      .post("/api/reviews/999999/comments")
+      .send(sendData)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no reviews found");
       });
   });
 });

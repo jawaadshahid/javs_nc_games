@@ -1,4 +1,7 @@
-const { selectCommentsByReviewId } = require("../models/comments.model");
+const {
+  selectCommentsByReviewId,
+  insertCommentByReviewId,
+} = require("../models/comments.model");
 const { selectReviewById } = require("../models/reviews.model");
 
 exports.getCommentsByReviewId = (req, res, next) => {
@@ -8,6 +11,21 @@ exports.getCommentsByReviewId = (req, res, next) => {
       return selectCommentsByReviewId(review_id).then((comments) => {
         res.status(200).send({ comments });
       });
+    })
+    .catch(next);
+};
+
+exports.postCommentByUsername = (req, res, next) => {
+  const { review_id } = req.params;
+  selectReviewById(review_id)
+    .then(() => {
+      const author = req.body.username;
+      const { body } = req.body;
+      return insertCommentByReviewId(review_id, author, body).then(
+        (comment) => {
+          res.status(201).send({ comment });
+        }
+      );
     })
     .catch(next);
 };
