@@ -1,3 +1,4 @@
+const { selectCategoryBySlug } = require("../models/categories.model");
 const {
   selectReviews,
   selectReviewById,
@@ -5,47 +6,48 @@ const {
 } = require("../models/reviews.model");
 
 exports.getReviews = (req, res, next) => {
-  selectReviews().then((reviews) => {
-    res.status(200).send({ reviews });
-  });
-};
-
-exports.getReviewById = (req, res, next) => {
-  const { review_id } = req.params;
-  if (isNaN(review_id)) {
-    next({
-      status: 400,
-      msg: "Bad request: Invalid Review ID",
-    });
+  const { sort_by, order, category } = req.query;
+  if (category) {
+    selectCategoryBySlug(category)
+      .then(() => {
+        selectReviews(sort_by, order, category)
+          .then((reviews) => {
+            res.status(200).send({ reviews });
+          })
+          .catch(next);
+      })
+      .catch(next);
   } else {
-    selectReviewById(review_id)
-      .then((review) => {
-        res.status(200).send({ review });
+    selectReviews(sort_by, order)
+      .then((reviews) => {
+        res.status(200).send({ reviews });
       })
       .catch(next);
   }
 };
 
+exports.getReviewById = (req, res, next) => {
+  const { review_id } = req.params;
+  selectReviewById(review_id)
+    .then((review) => {
+      res.status(200).send({ review });
+    })
+    .catch(next);
+};
+
 exports.patchReviewById = (req, res, next) => {
   const { review_id } = req.params;
-  if (isNaN(review_id)) {
+  const { inc_votes } = req.body;
+  if (Object.keys(req.body).length !== 1) {
     next({
-      status: 400,
-      msg: "Bad request: Invalid Review ID",
+      status: 422,
+      msg: "Unprocessable Entity: Invalid request",
     });
   } else {
-    const { inc_votes } = req.body;
-    if (!isNaN(inc_votes) && Object.keys(req.body).length === 1) {
-      incrementReviewVotesById(review_id, inc_votes)
-        .then((review) => {
-          res.status(200).send({ review });
-        })
-        .catch(next);
-    } else {
-      next({
-        status: 422,
-        msg: "Unprocessable Entity: Invalid request",
-      });
-    }
+    incrementReviewVotesById(review_id, inc_votes)
+      .then((review) => {
+        res.status(200).send({ review });
+      })
+      .catch(next);
   }
 };
