@@ -1,16 +1,15 @@
 const categoriesRouter = require("./categories.router");
 const commentsRouter = require("./comments.router");
 const reviewsRouter = require("./reviews.router");
+const usersRouter = require("./users.router");
 const apiRouter = require("express").Router();
 
 const listRoutes = (routes, stack, parent) => {
   parent = parent || "";
   if (stack) {
-    stack.forEach(function (r) {
+    stack.forEach((r) => {
       if (r.route && r.route.path) {
-        var method = "";
-
-        for (method in r.route.methods) {
+        for (let method in r.route.methods) {
           if (r.route.methods[method]) {
             routes.push({
               method: method.toUpperCase(),
@@ -38,5 +37,6 @@ apiRouter.get("/", (req, res, next) => {
 apiRouter.use("/categories", categoriesRouter);
 apiRouter.use("/reviews", reviewsRouter);
 apiRouter.use("/comments", commentsRouter);
+apiRouter.use("/users", usersRouter);
 
 module.exports = apiRouter;

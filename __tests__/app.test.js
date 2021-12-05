@@ -377,3 +377,24 @@ describe("endpoint: delete '/api/comments/:comment_id'", () => {
       });
   });
 });
+
+
+describe("endpoint: get '/api/users'", () => {
+  test("status 200: Responds with an array of Users, each with a 'username'", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(users).toBeInstanceOf(Array);
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(user).toEqual(
+            expect.objectContaining({
+              username: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
