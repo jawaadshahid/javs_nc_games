@@ -378,7 +378,6 @@ describe("endpoint: delete '/api/comments/:comment_id'", () => {
   });
 });
 
-
 describe("endpoint: get '/api/users'", () => {
   test("status 200: Responds with an array of Users, each with a 'username'", () => {
     return request(app)
@@ -395,6 +394,33 @@ describe("endpoint: get '/api/users'", () => {
             })
           );
         });
+      });
+  });
+});
+
+describe("endpoint: get '/api/users/:username'", () => {
+  test("status 200: Responds with a user object", () => {
+    return request(app)
+      .get("/api/users/philippaclaire9")
+      .expect(200)
+      .then(({ body }) => {
+        const { user } = body;
+        expect(user).toEqual(
+          expect.objectContaining({
+            username: "philippaclaire9",
+            name: "philippa",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+          })
+        );
+      });
+  });
+  test("status 404: Responds not found error when user not found", () => {
+    return request(app)
+      .get("/api/users/dsadsad")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no reviews found");
       });
   });
 });
