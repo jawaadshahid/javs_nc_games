@@ -36,7 +36,7 @@ jobs:
         run: npm ci
         
       - name: Run tests
-        run: PGDATABASE=nc_games_test PGUSER=test_user PGPASSWORD=test_password npm t
+        run: NODE_ENV=test PGDATABASE=nc_games_test PGUSER=test_user PGPASSWORD=test_password npm t
   # This workflow contains a single job called "build"
   deploy:
     runs-on: ubuntu-latest
