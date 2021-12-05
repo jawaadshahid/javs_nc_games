@@ -28,7 +28,7 @@ jobs:
       - name: Use PostgreSQL
         uses: harmon758/postgresql-action@v1
         with:
-          postgresql db: 'my_db'
+          postgresql db: 'nc_games_test'
           postgresql user: 'test_user'
           postgresql password: 'test_password'
           
@@ -36,7 +36,7 @@ jobs:
         run: npm ci
         
       - name: Run tests
-        run: PGDATABASE=my_db PGUSER=test_user PGPASSWORD=test_password npm t
+        run: PGDATABASE=nc_games_test PGUSER=test_user PGPASSWORD=test_password npm t
   # This workflow contains a single job called "build"
   deploy:
     runs-on: ubuntu-latest
