@@ -36,6 +36,26 @@ const commentObjTest = (commentObj) => {
   );
 };
 
+describe("endpoint: get '/api'", () => {
+  test("status 200: Responds with JSON describing all available endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        const { routes } = body;
+        expect(routes).toBeInstanceOf(Array);
+        routes.forEach((route) => {
+          expect(route).toEqual(
+            expect.objectContaining({
+              method: expect.any(String),
+              path: expect.any(String),
+            })
+          );
+        });
+      });
+  });
+});
+
 describe("endpoint: get '/api/categories'", () => {
   test("status 200: Responds with an array of category objects with correct properties'", () => {
     return request(app)
