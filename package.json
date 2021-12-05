@@ -6,7 +6,7 @@
   "scripts": {
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "npm run setup-dbs && node ./db/seeds/run-seed.js",
-    "test": "npm run setup-dbs && jest",
+    "test": "sudo service postgresql restart && npm run setup-dbs && jest",
     "start": "node listen.js",
     "seed:prod": "NODE_ENV=production DATABASE_URL=$(heroku config:get DATABASE_URL) npm run seed"
   },
