@@ -338,3 +338,22 @@ describe("endpoint: post '/api/reviews/:review_id/comments'", () => {
       });
   });
 });
+
+describe("endpoint: delete '/api/comments/:comment_id'", () => {
+  test("status 204: Should delete the given comment by `comment_id` and responds with no content", () => {
+    return request(app)
+      .delete("/api/comments/2")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+  test("status 204: Should delete the given comment by `comment_id` and responds with no content", () => {
+    return request(app)
+      .delete("/api/comments/999999")
+      .expect(204)
+      .then(({ body }) => {
+        expect(body).toEqual({});
+      });
+  });
+});

@@ -1,6 +1,7 @@
 const {
   selectCommentsByReviewId,
   insertCommentByReviewId,
+  deleteCommentByCommentId,
 } = require("../models/comments.model");
 const { ifReviewExistsById } = require("../models/reviews.model");
 
@@ -26,6 +27,15 @@ exports.postCommentByUsername = (req, res, next) => {
           res.status(201).send({ comment });
         }
       );
+    })
+    .catch(next);
+};
+
+exports.removeCommentByCommentId = (req, res, next) => {
+  const { comment_id } = req.params;
+  deleteCommentByCommentId(comment_id)
+    .then(() => {
+      res.status(204).send();
     })
     .catch(next);
 };
