@@ -420,7 +420,7 @@ describe("endpoint: get '/api/users/:username'", () => {
       .get("/api/users/dsadsad")
       .expect(404)
       .then(({ body }) => {
-        expect(body.msg).toBe("Not found: no reviews found");
+        expect(body.msg).toBe("Not found: no user found");
       });
   });
 });

@@ -15,7 +15,7 @@ exports.selectUserByUsername = (username) => {
       } else {
         return Promise.reject({
           status: 404,
-          msg: "Not found: no reviews found",
+          msg: "Not found: no user found",
         });
       }
     });
