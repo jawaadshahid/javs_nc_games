@@ -197,7 +197,7 @@ describe("endpoint: get '/api/reviews'", () => {
         expect(reviews).toBeSorted("created_at", { descending: true });
       });
   });
-  test("Should accept `sort_by` query, which sorts by any valid column", () => {
+  test("Should accept `sort_by` `votes` query, which sorts by `votes` column", () => {
     return request(app)
       .get("/api/reviews?sort_by=votes")
       .then(({ body }) => {
@@ -211,6 +211,14 @@ describe("endpoint: get '/api/reviews'", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe("Bad request: Invalid sort query");
+      });
+  });
+  test("Should accept `sort_by` `comment_count` query, which sorts by `comment_count` column", () => {
+    return request(app)
+      .get("/api/reviews?sort_by=comment_count")
+      .then(({ body }) => {
+        const { reviews } = body;
+        expect(reviews).toBeSortedBy("comment_count", { descending: true });
       });
   });
   test("Should accept `order` query, which sets sort order", () => {

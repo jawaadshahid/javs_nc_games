@@ -55,8 +55,11 @@ exports.selectReviews = (sort_by = "created_at", order = "desc", category) => {
     });
   }
 
-  queryStr += ` GROUP BY reviews.review_id
-  ORDER BY reviews.${sort_by} ${order};`;
+  queryStr += ` GROUP BY reviews.review_id`;
+
+  queryStr += ` ORDER BY ${
+    sort_by === "comment_count" ? "" : "reviews."
+  }${sort_by} ${order};`;
 
   // pass category as arg only when its defined
   return db
