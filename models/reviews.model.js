@@ -39,6 +39,7 @@ exports.selectReviews = (sort_by = "created_at", order = "desc", category) => {
       "category",
       "owner",
       "created_at",
+      "comment_count",
     ].includes(sort_by)
   ) {
     return Promise.reject({
