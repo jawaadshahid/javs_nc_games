@@ -3,6 +3,7 @@ const testData = require('../db/data/test-data/index.js');
 const seed = require("../db/seeds/seed.js");
 const request = require("supertest");
 const app = require("../app");
+const { patch } = require("../routers/categories.router.js");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -363,6 +364,75 @@ describe("endpoint: post '/api/reviews/:review_id/comments'", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.msg).toBe("Not found: no reviews found");
+      });
+  });
+});
+
+describe("endpoint: patch '/api/comments/:comment_id'", () => {
+  test("status 200: Request body accepts an object", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app).patch("/api/comments/1").send(sendData).expect(200);
+  });
+  test("Responds with the updated comment object", () => {
+    const sendData = { inc_votes: -2 };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(sendData)
+      .expect(200)
+      .then(({ body }) => {
+        const { comment } = body;
+        commentObjTest(comment);
+        expect(comment.votes).toBe(14);
+      });
+  });
+  test("status 400: Bad request error when comment_id invalid", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/asd")
+      .send(sendData)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request: Invalid Comment ID");
+      });
+  });
+  test("status 404: Not found error when comment not found", () => {
+    const sendData = { inc_votes: 1 };
+    return request(app)
+      .patch("/api/comments/99999")
+      .send(sendData)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found: no comments found");
+      });
+  });
+  test("status 422: Unprocessable Entity error when inc_votes not set", () => {
+    const sendData = {};
+    return request(app)
+      .patch("/api/comments/1")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
+      });
+  });
+  test("status 422: Unprocessable Entity error when inc_votes value invalid", () => {
+    const sendData = { inc_votes: "cat" };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
+      });
+  });
+  test("status 422: Unprocessable Entity error when Some other property on request body", () => {
+    const sendData = { inc_votes: 1, ping: "pong" };
+    return request(app)
+      .patch("/api/comments/1")
+      .send(sendData)
+      .expect(422)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Unprocessable Entity: Invalid request");
       });
   });
 });

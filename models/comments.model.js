@@ -53,3 +53,38 @@ exports.deleteCommentByCommentId = (comment_id) => {
     [comment_id]
   );
 };
+
+exports.patchCommentByCommentId = (comment_id, inc_votes) => {
+  if (isNaN(comment_id)) {
+    return Promise.reject({
+      status: 400,
+      msg: `Bad request: Invalid Comment ID`,
+    });
+  }
+  if (isNaN(inc_votes)) {
+    return Promise.reject({
+      status: 422,
+      msg: `Unprocessable Entity: Invalid request`,
+    });
+  }
+  return db
+    .query(
+      `
+      UPDATE comments 
+        SET votes = votes + $2
+      WHERE comment_id = $1
+      RETURNING *
+    ;`,
+      [comment_id, inc_votes]
+    )
+    .then((results) => {
+      if (results.rows.length > 0) {
+        return results.rows[0];
+      } else {
+        return Promise.reject({
+          status: 404,
+          msg: "Not found: no comments found",
+        });
+      }
+    });
+};

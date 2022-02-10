@@ -2,6 +2,7 @@ const {
   selectCommentsByReviewId,
   insertCommentByReviewId,
   deleteCommentByCommentId,
+  patchCommentByCommentId,
 } = require("../models/comments.model");
 const { ifReviewExistsById } = require("../models/reviews.model");
 
@@ -36,6 +37,17 @@ exports.removeCommentByCommentId = (req, res, next) => {
   deleteCommentByCommentId(comment_id)
     .then(() => {
       res.status(204).send();
+    })
+    .catch(next);
+};
+
+exports.patchCommentByCommentId = (req, res, next) => {
+  const { comment_id } = req.params;
+  const inc_votes =
+    Object.keys(req.body).length === 1 ? req.body.inc_votes : undefined;
+  patchCommentByCommentId(comment_id, inc_votes)
+    .then((comment) => {
+      res.status(200).send({ comment });
     })
     .catch(next);
 };
